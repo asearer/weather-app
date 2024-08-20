@@ -27,17 +27,41 @@
 export default {
   data() {
     return {
-      forecastData: [], // Initialize as an empty array
+      forecastData: [],
       scrollAmount: 300, // Adjust scroll amount based on your design
     };
   },
   mounted() {
-    this.fetchForecastData();
+    this.getLocationAndFetchData();
   },
   methods: {
-    async fetchForecastData() {
+    async getLocationAndFetchData() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          this.handleGeolocationSuccess,
+          this.handleGeolocationError
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    },
+    
+    async handleGeolocationSuccess(position) {
+      const { latitude, longitude } = position.coords;
+      this.fetchForecastData(latitude, longitude);
+    },
+    
+    handleGeolocationError(error) {
+      console.error('Error getting geolocation:', error);
+      // You can set default coordinates if geolocation fails
+      const defaultLat = 35.6895;  // Default latitude for Tokyo
+      const defaultLng = 139.6917; // Default longitude for Tokyo
+      this.fetchForecastData(defaultLat, defaultLng);
+    },
+
+    async fetchForecastData(latitude, longitude) {
       try {
-        const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=Asia/Tokyo');
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`);
         
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -78,20 +102,20 @@ export default {
   align-items: center;
   position: relative;
   overflow: hidden;
-  width: 100%; /* Ensure the container is full-width */
+  width: 100%;
 }
 
 .forecast-container {
   display: flex;
-  overflow: hidden; /* Hide overflow for carousel effect */
-  width: 100%; /* Ensure the container is full-width */
+  overflow: hidden;
+  width: 100%;
 }
 
 .forecast-row {
   display: flex;
-  overflow-x: scroll; /* Allow horizontal scrolling */
-  scroll-behavior: smooth; /* Smooth scrolling effect */
-  width: 100%; /* Ensure full width for scrolling */
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  width: 100%;
   
   /* Hide scrollbar */
   scrollbar-width: none; /* Firefox */
@@ -107,14 +131,14 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  max-width: 300px; /* Adjust width as needed */
-  margin: 10px; /* Space between cards */
+  max-width: 300px;
+  margin: 10px;
   text-align: center;
   flex: 0 0 auto; /* Prevent cards from shrinking */
 }
 
 p {
-  margin: 10px 0; /* Margin for text */
+  margin: 10px 0;
 }
 
 /* Carousel buttons */
@@ -133,30 +157,32 @@ p {
 }
 
 .prev {
-  left: 10px; /* Adjust position as needed */
+  left: 10px;
 }
 
 .next {
-  right: 10px; /* Adjust position as needed */
+  right: 10px;
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
   .weather-card {
-    min-width: 200px; /* Adjust min-width for smaller screens */
-    max-width: 250px; /* Adjust max-width for smaller screens */
-    padding: 15px; /* Adjust padding for smaller screens */
+    min-width: 200px;
+    max-width: 250px;
+    padding: 15px;
   }
 }
 
 @media (max-width: 480px) {
   .weather-card {
-    min-width: 150px; /* Adjust min-width for very small screens */
-    max-width: 200px; /* Adjust max-width for very small screens */
-    padding: 10px; /* Adjust padding for very small screens */
+    min-width: 150px;
+    max-width: 200px;
+    padding: 10px;
   }
 }
 </style>
+
+
 
 
 
