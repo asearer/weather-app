@@ -4,6 +4,7 @@
     <div class="forecast-container">
       <div v-if="forecastData.length" class="forecast-row">
         <div v-for="(item, index) in forecastData" :key="index" class="weather-card">
+          <i :class="getIconClass(item.weather_code)" class="weather-icon"></i>
           <p>
             <strong>Date:</strong> {{ item.date || 'N/A' }}
           </p>
@@ -53,7 +54,7 @@ export default {
     
     handleGeolocationError(error) {
       console.error('Error getting geolocation:', error);
-      // You can set default coordinates if geolocation fails
+      // Use default coordinates if geolocation fails
       const defaultLat = 35.6895;  // Default latitude for Tokyo
       const defaultLng = 139.6917; // Default longitude for Tokyo
       this.fetchForecastData(defaultLat, defaultLng);
@@ -61,7 +62,7 @@ export default {
 
     async fetchForecastData(latitude, longitude) {
       try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`);
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=auto`);
         
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -83,9 +84,40 @@ export default {
           temperature_max: data.daily.temperature_2m_max ? data.daily.temperature_2m_max[index] : 'N/A',
           temperature_min: data.daily.temperature_2m_min ? data.daily.temperature_2m_min[index] : 'N/A',
           precipitation: data.daily.precipitation_sum ? data.daily.precipitation_sum[index] : 'N/A',
+          weather_code: data.daily.weathercode ? data.daily.weathercode[index] : 'default',
         }));
       }
       return [];
+    },
+
+    getIconClass(weatherCode) {
+      const iconMap = {
+        0: 'wi wi-day-sunny',       // Clear sky
+        1: 'wi wi-day-cloudy',      // Mainly clear
+        2: 'wi wi-day-cloudy',      // Partly cloudy
+        3: 'wi wi-day-cloudy',      // Overcast
+        45: 'wi wi-fog',            // Fog
+        48: 'wi wi-snow',           // Freezing fog
+        51: 'wi wi-snow',           // Light snow showers
+        53: 'wi wi-snow',           // Moderate snow showers
+        55: 'wi wi-snow',           // Heavy snow showers
+        61: 'wi wi-rain',           // Light rain showers
+        63: 'wi wi-rain',           // Moderate rain showers
+        65: 'wi wi-rain',           // Heavy rain showers
+        71: 'wi wi-snow',           // Light snow
+        73: 'wi wi-snow',           // Moderate snow
+        75: 'wi wi-snow',           // Heavy snow
+        80: 'wi wi-showers',        // Light showers
+        81: 'wi wi-showers',        // Moderate showers
+        82: 'wi wi-showers',        // Heavy showers
+        85: 'wi wi-snow',           // Light snow showers
+        86: 'wi wi-snow',           // Heavy snow showers
+        95: 'wi wi-thunderstorm',   // Thunderstorm
+        96: 'wi wi-thunderstorm',   // Thunderstorm with hail
+        99: 'wi wi-thunderstorm',   // Thunderstorm with hail
+      };
+
+      return iconMap[weatherCode] || 'wi wi-na'; // Fallback icon
     },
     
     scroll(direction) {
@@ -137,6 +169,12 @@ export default {
   flex: 0 0 auto; /* Prevent cards from shrinking */
 }
 
+.weather-icon {
+  font-size: 40px; /* Adjust size as needed */
+  display: block;
+  margin: 0 auto 10px;
+}
+
 p {
   margin: 10px 0;
 }
@@ -181,6 +219,7 @@ p {
   }
 }
 </style>
+
 
 
 
