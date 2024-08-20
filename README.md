@@ -3,6 +3,8 @@
 ## Overview
 Weather App is a Vue.js application that provides detailed weather forecasts. It fetches weather data from the Open Meteo API and displays it in a user-friendly format. The app is designed to offer current weather information and a 7-day forecast, displayed in a responsive horizontal layout.
 
+**Note:** This application is a work in progress. Features and functionality are continually being developed and improved.
+
 ## Features
 - **Current Weather**: Displays the current weather conditions.
 - **7-Day Forecast**: Shows daily weather forecasts including max and min temperatures, and precipitation.
@@ -21,5 +23,6 @@ Weather App is a Vue.js application that provides detailed weather forecasts. It
 - **API**: Open Meteo API
 - **Styling**: Scoped CSS for component-specific styles
 - **API Endpoint**: The app currently uses the Open Meteo API to fetch weather data.
+
 
 
